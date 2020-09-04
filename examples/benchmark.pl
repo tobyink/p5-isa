@@ -23,3 +23,8 @@ cmpthese -3, {
 	native => $common . '$::obj isa Thingy',
 	isa_pm => $common . '::isa_Thingy $::obj',
 };
+
+__END__
+             Rate native isa_pm
+native  6619309/s     --   -53%
+isa_pm 14206513/s   115%     --
