@@ -36,7 +36,7 @@ sub subname_for {
 
 my %cache;
 sub setup_for {
-	my ( $me, $caller, $imports ) = ( shift, @_ );		
+	my ( $me, $caller, $imports ) = ( shift, @_ );
 	
 	while ( my ($subname, $class) = each %$imports ) {
 		no strict 'refs';
