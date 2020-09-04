@@ -5,7 +5,7 @@ use warnings;
 package isa;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.002';
+our $VERSION   = '2.000';
 
 BEGIN {
 	*HAS_XS     = eval { require Type::Tiny::XS; 1 } ? sub(){!!1} : sub(){!!0};
