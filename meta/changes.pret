@@ -4,3 +4,9 @@
 	issued  2020-09-04;
 	label   "Initial release".
 
+`MooX-Press 0.002 cpan:TOBYINK`
+	issued  2020-09-04;
+	changeset [
+		item "Description mentioned `isa` operator being introduced in Perl 5.30; it should have save 5.32."^^Documentation;
+		item "Bundle a benchmark script."^^Documentation;
+	].
