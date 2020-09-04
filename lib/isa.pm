@@ -113,7 +113,7 @@ isa - isn't the isa operator
 
 =head1 DESCRIPTION
 
-The new C<isa> operator in Perl 5.30 is pretty great, but if you need to
+The new C<isa> operator in Perl 5.32 is pretty great, but if you need to
 support legacy versions of Perl, you can't use it yet. This module gives
 you isa-like functions you can use in Perl 5.6 and above.
 
