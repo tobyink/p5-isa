@@ -71,47 +71,35 @@ sub setup_for {
 
 sub generate_coderef {
 	my ( $me, $class ) = ( shift, @_ );
+	my $code;
 	
-	my $coderef;
 	if ( HAS_XS ) {
-		my $native_will_be_faster = 0;
-		
-		if ( HAS_NATIVE ) {
-			my $class_isa = eval { $class->can('isa') };
-			if ( $class_isa and $class_isa != \&UNIVERSAL::isa ) {
-				$native_will_be_faster = 1;
-			}
-		}
-		
-		unless ( $native_will_be_faster ) {
-			my $typename = sprintf('InstanceOf[%s]', $class);
-			$coderef = Type::Tiny::XS::get_coderef_for($typename);
-			return $coderef if is_coderef($coderef);
-		}
+		my $typename = sprintf('InstanceOf[%s]', $class);
+		$code = Type::Tiny::XS::get_coderef_for($typename);
+		return $code if is_coderef $code;
 	}
 	
 	if ( HAS_MOUSE ) {
-		$coderef = Mouse::Util::generate_isa_predicate_for($class);
-		return $coderef if is_coderef($coderef);
+		$code = Mouse::Util::generate_isa_predicate_for($class);
+		return $code if is_coderef $code;
 	}	
 	
-	my $code;
 	if ( HAS_NATIVE ) {
-		$code = sprintf(
+		$code = eval sprintf(
 			q{ package isa::__NATIVE__; use feature q[isa]; no warnings q[experimental::isa]; sub { $_[0] isa %s } },
 			perlstring($class),
 		);
+		return $code if is_coderef $code;
 	}
-	else {
-		require Scalar::Util;
-		$code = sprintf(
-			q{ package isa::__LEGACY__; sub { Scalar::Util::blessed($_[0]) and $_[0]->isa(%s) } },
-			perlstring($class),
-		);
-	}
+
+	require Scalar::Util;
+	$code = eval sprintf(
+		q{ package isa::__LEGACY__; sub { Scalar::Util::blessed($_[0]) and $_[0]->isa(%s) } },
+		perlstring($class),
+	);
+	return $code if is_coderef $code;
 	
-	$coderef = eval $code;
-	is_coderef($coderef) ? $coderef : undef;
+	return;
 }
 
 1;
