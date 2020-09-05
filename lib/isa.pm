@@ -23,6 +23,10 @@ BEGIN {
 	
 	*perlstring = eval { require B; 'B'->can('perlstring') }
 		|| sub { sprintf '"%s"', quotemeta($_[0]) };
+	
+	*is_coderef = HAS_XS()
+		? Type::Tiny::XS::get_coderef_for('CodeRef')
+		: sub { 'CODE' eq ref $_[0] };
 };
 
 sub import {
@@ -77,13 +81,13 @@ sub generate_coderef {
 		unless ($native_will_be_faster) {
 			my $typename = sprintf('InstanceOf[%s]', $class);
 			$coderef = Type::Tiny::XS::get_coderef_for($typename);
-			return $coderef if ref($coderef);
+			return $coderef if is_coderef($coderef);
 		}
 	}
 	
 	if ( HAS_MOUSE ) {
 		$coderef = Mouse::Util::generate_isa_predicate_for($class);
-		return $coderef if ref($coderef);
+		return $coderef if is_coderef($coderef);
 	}	
 	
 	my $code;
@@ -102,7 +106,7 @@ sub generate_coderef {
 	}
 	
 	$coderef = eval $code;
-	ref($coderef) ? $coderef : ();
+	is_coderef($coderef) ? $coderef : undef;
 }
 
 1;
