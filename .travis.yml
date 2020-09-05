@@ -1,37 +1,92 @@
 language: perl
-env:
-  - USE_XS=1
-  - USE_PP=1
-perl:
-  - "5.32"
-  - "5.30"
-  - "5.28"
-  - "5.26"
-    dist: trusty
-  - "5.24"
-    dist: trusty
-  - "5.22"
-    dist: trusty
-  - "5.20"
-    dist: trusty
-  - "5.18"
-    dist: trusty
-  - "5.16"
-    dist: trusty
-  - "5.14"
-    dist: trusty
-  - "5.12"
-    dist: trusty
-  - "5.10"
-    dist: trusty
-  - "5.8.9"
-    dist: trusty
-  - "5.8.9"
-    dist: trusty
-  - "5.8.1"
-    dist: trusty
-  - "blead"
-  - "dev"
+matrix:
+  include:
+    - perl: "blead"
+      env: USE_XS=1
+    - perl: "dev"
+      env: USE_XS=1
+    - perl: "5.32"
+      env: USE_XS=1
+    - perl: "5.30"
+      env: USE_XS=1
+    - perl: "5.28"
+      env: USE_XS=1
+    - perl: "5.26"
+      dist: trusty
+      env: USE_XS=1
+    - perl: "5.24"
+      dist: trusty
+      env: USE_XS=1
+    - perl: "5.22"
+      dist: trusty
+      env: USE_XS=1
+    - perl: "5.20"
+      dist: trusty
+      env: USE_XS=1
+    - perl: "5.18"
+      dist: trusty
+      env: USE_XS=1
+    - perl: "5.16"
+      dist: trusty
+      env: USE_XS=1
+    - perl: "5.14"
+      dist: trusty
+      env: USE_XS=1
+    - perl: "5.12"
+      dist: trusty
+      env: USE_XS=1
+    - perl: "5.10"
+      dist: trusty
+      env: USE_XS=1
+    - perl: "5.8.9"
+      dist: trusty
+      env: USE_XS=1
+    - perl: "5.8.1"
+      dist: trusty
+      env: USE_XS=1
+    - perl: "blead"
+      env: USE_PP=1
+    - perl: "dev"
+      env: USE_PP=1
+    - perl: "5.32"
+      env: USE_PP=1
+    - perl: "5.30"
+      env: USE_PP=1
+    - perl: "5.28"
+      env: USE_PP=1
+    - perl: "5.26"
+      dist: trusty
+      env: USE_PP=1
+    - perl: "5.24"
+      dist: trusty
+      env: USE_PP=1
+    - perl: "5.22"
+      dist: trusty
+      env: USE_PP=1
+    - perl: "5.20"
+      dist: trusty
+      env: USE_PP=1
+    - perl: "5.18"
+      dist: trusty
+      env: USE_PP=1
+    - perl: "5.16"
+      dist: trusty
+      env: USE_PP=1
+    - perl: "5.14"
+      dist: trusty
+      env: USE_PP=1
+    - perl: "5.12"
+      dist: trusty
+      env: USE_PP=1
+    - perl: "5.10"
+      dist: trusty
+      env: USE_PP=1
+    - perl: "5.8.9"
+      dist: trusty
+      env: USE_PP=1
+    - perl: "5.8.1"
+      dist: trusty
+      env: USE_PP=1
 before_install:
   - export DIST_INKT_PROFILE="Dist::Inkt::Profile::TOBYINK"
   - eval $(curl https://travis-perl.github.io/init) --auto
@@ -40,4 +95,4 @@ install:
   - cpan-install --deps
   - '[ -n "$USE_XS" ] && cpan-install Type::Tiny::XS || echo "Not installing XS components"'
 script:
-  - prove -r -Ilib -Iinc $(test-dirs)
+  - prove -r -Ilib $(test-dirs)
