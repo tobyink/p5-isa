@@ -17,7 +17,7 @@ BEGIN {
 		? sub(){!!1}
 		: sub(){!!0};
 	
-	*HAS_NATIVE = ($] ge '5.032')
+	*HAS_NATIVE = ( $] ge '5.032' )
 		? sub(){!!1}
 		: sub(){!!0};
 	
@@ -83,7 +83,7 @@ sub generate_coderef {
 			}
 		}
 		
-		unless ($native_will_be_faster) {
+		unless ( $native_will_be_faster ) {
 			my $typename = sprintf('InstanceOf[%s]', $class);
 			$coderef = Type::Tiny::XS::get_coderef_for($typename);
 			return $coderef if is_coderef($coderef);
