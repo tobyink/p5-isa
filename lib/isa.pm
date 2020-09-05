@@ -77,13 +77,13 @@ sub generate_coderef {
 		unless ($native_will_be_faster) {
 			my $typename = sprintf('InstanceOf[%s]', $class);
 			$coderef = Type::Tiny::XS::get_coderef_for($typename);
-			return $coderef if $coderef;
+			return $coderef if ref($coderef);
 		}
 	}
 	
 	if ( HAS_MOUSE ) {
 		$coderef = Mouse::Util::generate_isa_predicate_for($class);
-		return $coderef if $coderef;
+		return $coderef if ref($coderef);
 	}	
 	
 	my $code;
