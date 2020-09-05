@@ -27,21 +27,26 @@ BEGIN {
 	*is_coderef = HAS_XS()
 		? Type::Tiny::XS::get_coderef_for('CodeRef')
 		: sub { 'CODE' eq ref $_[0] };
+	
+	*is_hashref = HAS_XS()
+		? Type::Tiny::XS::get_coderef_for('HashRef')
+		: sub { 'HASH' eq ref $_[0] };
 };
 
 sub import {
 	my ( $caller, $me ) = ( scalar(caller), shift );
 	
-	my $imports;
-	if ( @_==1 and ref($_[0]) eq 'HASH' ) {
-		$imports = $_[0];
-	}
-	else {
-		my %imports = map { $me->subname_for($_) => $_ } @_;
-		$imports = \%imports;
+	my %imports;
+	for my $arg ( @_ ) {
+		if ( is_hashref($arg) ) {
+			%imports = ( %imports, %$arg );
+		}
+		else {
+			$imports{ $me->subname_for($arg) } = $arg;
+		}
 	}
 	
-	$me->setup_for($caller, $imports);
+	$me->setup_for($caller, \%imports);
 }
 
 sub subname_for {
@@ -160,9 +165,6 @@ you can use a hashref in the import:
     isa_Browser => 'HTTP::Tiny',
     isa_Person  => 'MyApp::Person',
   };
-
-You can't mix and match styles within one import, but you can
-C<< use isa >> more than once.
 
 =head1 BUGS
 
