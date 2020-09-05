@@ -146,6 +146,9 @@ you isa-like functions you can use in Perl 5.6 and above.
 If you've got L<Type::Tiny::XS> installed, you will probably find that
 this module is I<faster> than the native C<isa> operator!
 
+The functions exported respect inheritance and allow classes to override
+their C<isa> method as you'd expect.
+
 =head1 IMPORT
 
 You need to list the classes you'll be using on the C<use> line.
