@@ -8,9 +8,21 @@ our $AUTHORITY = 'cpan:TOBYINK';
 our $VERSION   = '2.000';
 
 BEGIN {
-	*HAS_XS     = eval { require Type::Tiny::XS; 1 } ? sub(){!!1} : sub(){!!0};
-	*HAS_NATIVE = ($] ge '5.032') ? sub(){!!1} : sub(){!!0};
-	*perlstring = eval { require B; 'B'->can('perlstring') } || sub { sprintf '"%s"', quotemeta($_[0]) };
+	*HAS_XS = eval { require Type::Tiny::XS; 1 }
+		? sub(){!!1}
+		: sub(){!!0};
+	
+	eval { require Mouse::Util; } unless HAS_XS();
+	*HAS_MOUSE = eval { Mouse::Util::MOUSE_XS() and 'Mouse::Util'->can('generate_isa_predicate_for') }
+		? sub(){!!1}
+		: sub(){!!0};
+	
+	*HAS_NATIVE = ($] ge '5.032')
+		? sub(){!!1}
+		: sub(){!!0};
+	
+	*perlstring = eval { require B; 'B'->can('perlstring') }
+		|| sub { sprintf '"%s"', quotemeta($_[0]) };
 };
 
 sub import {
@@ -68,6 +80,11 @@ sub generate_coderef {
 			return $coderef if $coderef;
 		}
 	}
+	
+	if ( HAS_MOUSE ) {
+		$coderef = Mouse::Util::generate_isa_predicate_for($class);
+		return $coderef if $coderef;
+	}	
 	
 	my $code;
 	if ( HAS_NATIVE ) {
