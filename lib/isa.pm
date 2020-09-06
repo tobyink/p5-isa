@@ -34,7 +34,7 @@ BEGIN {
 		
 	*is_NonEmptyStr = HAS_XS()
 		? Type::Tiny::XS::get_coderef_for('NonEmptyStr')
-		: sub { defined $_[0] and !defined ref $_[0] and length $_[0] };
+		: sub { defined $_[0] and !length ref $_[0] and length $_[0] };
 };
 
 sub import {

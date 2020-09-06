@@ -26,8 +26,7 @@
 			dcs:thanks cpan:SBURKE;
 		];
 		item "If Type::Tiny::XS isn't available but Mouse is; attempt to borrow XS stuff from Mouse."^^Addition;
-		item [
-			label "Minor code cleanups.";
-		];
+		item "Minor code cleanups."^^Change;
 		item "Link to wiki in the pod."^^Documentation;
+		item "Check that function names and class names are non-empty strings."^^Change;
 	].
