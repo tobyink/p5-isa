@@ -105,7 +105,7 @@ sub generate_coderef {
 	if ( HAS_MOUSE ) {
 		$code = Mouse::Util::generate_isa_predicate_for( $class );
 		return $code if is_CodeRef $code;
-	}	
+	}
 	
 	if ( HAS_NATIVE ) {
 		$code = eval sprintf(
