@@ -24,13 +24,17 @@ BEGIN {
 	*perlstring = eval { require B; 'B'->can('perlstring') }
 		|| sub { sprintf '"%s"', quotemeta($_[0]) };
 	
-	*is_coderef = HAS_XS()
+	*is_CodeRef = HAS_XS()
 		? Type::Tiny::XS::get_coderef_for('CodeRef')
 		: sub { 'CODE' eq ref $_[0] };
 	
-	*is_hashref = HAS_XS()
+	*is_HashRef = HAS_XS()
 		? Type::Tiny::XS::get_coderef_for('HashRef')
 		: sub { 'HASH' eq ref $_[0] };
+		
+	*is_NonEmptyStr = HAS_XS()
+		? Type::Tiny::XS::get_coderef_for('NonEmptyStr')
+		: sub { defined $_[0] and !defined ref $_[0] and length $_[0] };
 };
 
 sub import {
@@ -38,7 +42,7 @@ sub import {
 	
 	my %imports;
 	for my $arg ( @_ ) {
-		if ( is_hashref $arg ) {
+		if ( is_HashRef $arg ) {
 			%imports = ( %imports, %$arg );
 		}
 		else {
@@ -55,11 +59,30 @@ sub subname_for {
 	'isa_' . $class;
 }
 
+sub failed_expectation {
+	my ( $me, $bad_value, $role, $expectation ) = ( shift, @_ );
+	my $printable_value =
+		ref($bad_value)        ? sprintf( '%s reference', ref($bad_value) ) :
+		!defined($bad_value)   ? 'undef' :
+		!length($bad_value)    ? 'empty string' : 'something weird';
+	
+	require Carp;
+	Carp::croak( sprintf(
+		'Expected %s to be %s, but got %s; failed',
+		$role,
+		$expectation,
+		$printable_value,
+	) );
+}
+
 my %cache;
 sub setup_for {
 	my ( $me, $caller, $imports ) = ( shift, @_ );
 	
 	while ( my ( $subname, $class ) = each %$imports ) {
+		is_NonEmptyStr $subname or $me->failed_expectation( $subname, 'function name', 'non-empty string' );
+		is_NonEmptyStr $class   or $me->failed_expectation( $class,   'class name',    'non-empty string' );
+		
 		no strict 'refs';
 		no warnings 'redefine';
 		*{"$caller\::$subname"} = (
@@ -76,12 +99,12 @@ sub generate_coderef {
 	if ( HAS_XS ) {
 		my $typename = sprintf( 'InstanceOf[%s]', $class );
 		$code = Type::Tiny::XS::get_coderef_for( $typename );
-		return $code if is_coderef $code;
+		return $code if is_CodeRef $code;
 	}
 	
 	if ( HAS_MOUSE ) {
 		$code = Mouse::Util::generate_isa_predicate_for( $class );
-		return $code if is_coderef $code;
+		return $code if is_CodeRef $code;
 	}	
 	
 	if ( HAS_NATIVE ) {
@@ -89,7 +112,7 @@ sub generate_coderef {
 			q{ package isa::__NATIVE__; use feature q[isa]; no warnings q[experimental::isa]; sub { $_[0] isa %s } },
 			perlstring($class),
 		);
-		return $code if is_coderef $code;
+		return $code if is_CodeRef $code;
 	}
 
 	require Scalar::Util;
@@ -97,7 +120,7 @@ sub generate_coderef {
 		q{ package isa::__LEGACY__; sub { Scalar::Util::blessed($_[0]) and $_[0]->isa(%s) } },
 		perlstring($class),
 	);
-	return $code if is_coderef $code;
+	return $code if is_CodeRef $code;
 	
 	return;
 }
