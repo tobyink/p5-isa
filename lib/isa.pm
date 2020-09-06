@@ -38,15 +38,15 @@ sub import {
 	
 	my %imports;
 	for my $arg ( @_ ) {
-		if ( is_hashref($arg) ) {
+		if ( is_hashref $arg ) {
 			%imports = ( %imports, %$arg );
 		}
 		else {
-			$imports{ $me->subname_for($arg) } = $arg;
+			$imports{ $me->subname_for( $arg ) } = $arg;
 		}
 	}
 	
-	$me->setup_for($caller, \%imports);
+	$me->setup_for( $caller, \%imports );
 }
 
 sub subname_for {
@@ -59,12 +59,12 @@ my %cache;
 sub setup_for {
 	my ( $me, $caller, $imports ) = ( shift, @_ );
 	
-	while ( my ($subname, $class) = each %$imports ) {
+	while ( my ( $subname, $class ) = each %$imports ) {
 		no strict 'refs';
 		no warnings 'redefine';
 		*{"$caller\::$subname"} = (
-			$cache{$class} ||= $me->generate_coderef($class)
-			or die("Problem generating coderef for $class")
+			$cache{ $class } ||= $me->generate_coderef( $class )
+			or die( "Problem generating coderef for $class" )
 		);
 	}
 }
@@ -74,13 +74,13 @@ sub generate_coderef {
 	my $code;
 	
 	if ( HAS_XS ) {
-		my $typename = sprintf('InstanceOf[%s]', $class);
-		$code = Type::Tiny::XS::get_coderef_for($typename);
+		my $typename = sprintf( 'InstanceOf[%s]', $class );
+		$code = Type::Tiny::XS::get_coderef_for( $typename );
 		return $code if is_coderef $code;
 	}
 	
 	if ( HAS_MOUSE ) {
-		$code = Mouse::Util::generate_isa_predicate_for($class);
+		$code = Mouse::Util::generate_isa_predicate_for( $class );
 		return $code if is_coderef $code;
 	}	
 	
