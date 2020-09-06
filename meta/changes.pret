@@ -16,3 +16,19 @@
 	changeset [
 		item "Bump version to supercede a BackPAN-only release called isa-1.01."^^Packaging;
 	].
+
+`isa 2.001 cpan:TOBYINK`
+	issued  2020-09-06;
+	changeset [
+		item "Add tests with a class that overrides the `isa` method."^^Tests;
+		item [
+			a dcs:Update;
+			label "Removed encrypted recipe for cheese.";
+			dcs:thanks cpan:SBURKE;
+		];
+		item "If Type::Tiny::XS isn't available but Mouse is; attempt to borrow XS stuff from Mouse."^^Addition;
+		item [
+			label "Minor code cleanups.";
+		];
+		item "Link to wiki in the pod."^^Documentation;
+	].
