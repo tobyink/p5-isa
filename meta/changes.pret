@@ -22,7 +22,6 @@
 	changeset [
 		item "Add tests with a class that overrides the `isa` method."^^Tests;
 		item [
-			a dcs:Update;
 			label "Removed encrypted recipe for cheese.";
 			dcs:thanks cpan:SBURKE;
 		];
