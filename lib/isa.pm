@@ -166,6 +166,8 @@ L<http://rt.cpan.org/Dist/Display.html?Queue=isa>.
 
 L<perlop>, L<Scalar::Util>.
 
+L<https://github.com/tobyink/p5-isa/wiki>.
+
 =head1 AUTHOR
 
 Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
