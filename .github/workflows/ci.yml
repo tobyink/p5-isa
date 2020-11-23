@@ -78,14 +78,18 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os:                 [ 'ubuntu:defaut', 'ubuntu:thr', 'ubuntu-16.04', 'macos:default', 'macos:thr', 'macos-11.0', 'windows:thr' ]
+        os:                 [ 'ubuntu:default', 'ubuntu:thr', 'ubuntu-16.04', 'macos:default', 'macos:thr', 'macos-11.0', 'windows:thr' ]
         perl:               [ '5.8', 'latest' ]
         coverage:           [ false ]
         extra_dependencies: [ true, false ]
         extended_testing:   [ 'extended' ]
+        exclude:
+          - { os: 'windows-latest', perl '5.8' }
+          - { os: 'windows-latest', perl '5.10' }
+          - { os: 'windows-latest', perl '5.12' }
           - { os: 'windows:thr', perl: '5.8' }
         include:
-          - os: 'ubuntu:default'
+          - os: 'ubuntu-latest'
             perl: '5.30'
             coverage: true
             extra_dependencies: true
