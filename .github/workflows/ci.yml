@@ -76,13 +76,14 @@ jobs:
       GHA_TESTING_COVER:    ${{ matrix.coverage }}
       GHA_INSTALL_EXTRAS:   ${{ matrix.extra_dependencies }}
     strategy:
-      fail-fast: true
+      fail-fast: false
       matrix:
         os:                 [ 'ubuntu:defaut', 'ubuntu:thr', 'ubuntu-16.04', 'macos:default', 'macos:thr', 'macos-11.0', 'windows:thr' ]
         perl:               [ '5.8', 'latest' ]
         coverage:           [ false ]
         extra_dependencies: [ true, false ]
         extended_testing:   [ 'extended' ]
+          - { os: 'windows:thr', perl: '5.8' }
         include:
           - os: 'ubuntu:default'
             perl: '5.30'
