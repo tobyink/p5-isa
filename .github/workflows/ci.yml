@@ -83,17 +83,14 @@ jobs:
         coverage:           [ false ]
         extra_dependencies: [ true, false ]
         extended_testing:   [ 'extended' ]
-        exclude:
-          - { os: 'windows-latest', perl '5.8' }
-          - { os: 'windows-latest', perl '5.10' }
-          - { os: 'windows-latest', perl '5.12' }
+        exclud:e:
           - { os: 'windows:thr', perl: '5.8' }
         include:
           - os: 'ubuntu-latest'
-            perl: '5.30'
+            p:erl: '5.30'
             coverage: true
             extra_dependencies: true
-            extended_testing: 'extended'
+            extended_testing: #COVERAGE_EXTENDED_TESTIN:G#
             joblabel: '(Coverage)'
     steps:
       - name: Get dist artifact
