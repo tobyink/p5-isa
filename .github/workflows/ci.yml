@@ -1,4 +1,4 @@
-name: Continuous Integration
+name: CI
 on:
   - push
   - pull_request
@@ -37,8 +37,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: dist
-          path: |
-            ./
+          path: ./
   inspect:
     name: Inspect distribution
     needs: dist
@@ -69,31 +68,24 @@ jobs:
       - name: META.yml
         run: cat build/META.yml
   test:
-    name: Perl ${{ matrix.perl }} ${{ matrix.os }} [thr=${{ matrix.threaded }}][xdep=${{ matrix.extra_dependencies }}] ${{ matrix.joblabel }}
+    name: Perl ${{ matrix.perl }} ${{ matrix.os }} [xdep=${{ matrix.extra_dependencies }}] ${{ matrix.joblabel }}
     needs: dist
-    runs-on: ${{ matrix.os }}-latest
+    runs-on: ${{ ( ( startsWith(matrix.os, 'ubuntu:') && 'ubuntu-latest' ) || ( startsWith(matrix.os, 'macos:') && 'macos-latest' ) || startsWith(matrix.os, 'windows:') && 'windows-latest' ) || matrix.os }}
     env:
-      COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_TOKEN }}
-      CODECOV_TOKEN:        ${{ secrets.CODECOV_TOKEN }}
       GHA_TESTING_MODE:     ${{ matrix.extended_testing }}
       GHA_TESTING_COVER:    ${{ matrix.coverage }}
+      GHA_INSTALL_EXTRAS:   ${{ matrix.extra_dependencies }}
     strategy:
       fail-fast: true
       matrix:
-        os:                 [ 'ubuntu', 'windows' ]
+        os:                 [ 'ubuntu:defaut', 'ubuntu:thr', 'ubuntu-16.04', 'macos:default', 'macos:thr', 'macos-11.0', 'windows:thr' ]
         perl:               [ '5.8', 'latest' ]
-        threaded:           [ true, false ]
         coverage:           [ false ]
         extra_dependencies: [ true, false ]
         extended_testing:   [ 'extended' ]
-        exclude:
-          - { os: 'windows', perl: '5.8' }
-          - { os: 'windows', perl: '5.10' }
-          - { os: 'windows', perl: '5.12' }
         include:
-          - os: ubuntu
+          - os: 'ubuntu:default'
             perl: '5.30'
-            threaded: false
             coverage: true
             extra_dependencies: true
             extended_testing: 'extended'
@@ -107,7 +99,8 @@ jobs:
         uses: shogo82148/actions-setup-perl@v1
         with:
           perl-version: ${{ matrix.perl }}
-          multi-thread: ${{ matrix.threaded }}
+          multi-thread: ${{ ( ( startsWith(matrix.os, 'windows') || endsWith(matrix.os, ':thr') ) && true ) || false }}
+          distribution: ${{ ( endsWith(matrix.os, ':strawberry') && 'strawberry' ) || 'default' }}
       - name: Perl version
         run: |
           perl -v
@@ -116,11 +109,11 @@ jobs:
         run: perl Makefile.PL
       - name: Install dependencies
         run: |
+          cpanm -n App::GhaProve
           cpanm -n --installdeps ./build
-          cpanm App::GhaProve
       - name: Install extra dependencies
         if: matrix.extra_dependencies || matrix.coverage
-        run: cpanm -n --installdeps --with-recommends --with-suggests ./build
+        run: cpanm -n --installdeps --with-recommends --with-suggests ./build || true
       - name: Install coverage dependencies
         if: matrix.coverage
         run: |
@@ -140,8 +133,12 @@ jobs:
       - name: Coveralls.io report
         if: success() && matrix.coverage
         working-directory: ./build/
-        run: cover -report coveralls
+        env:
+          COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_TOKEN }}
+        run: cover -select_re '^blib/lib/' -report coveralls
       - name: Codecov.io report
         if: success() && matrix.coverage
         working-directory: ./build/
-        run: cover -report codecov
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+        run: cover -select_re '^blib/lib/' -report codecov
